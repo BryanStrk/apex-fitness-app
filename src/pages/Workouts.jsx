@@ -11,7 +11,7 @@
         description: 'High-intensity interval training for maximum caloric burn',
         duration: 45,
         calories: 650,
-        imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800',
+        imageUrl: 'https://res.cloudinary.com/dutmn3xde/image/upload/v1776594314/category_hiit_wpndxv.jpg',
     },
     {
         id: 2,
@@ -21,7 +21,7 @@
         description: 'Build strength and flexibility through dynamic sequences',
         duration: 60,
         calories: 380,
-        imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800',
+        imageUrl: 'https://res.cloudinary.com/dutmn3xde/image/upload/v1776611489/category_yoga_hwftfm.jpg',
     },
     {
         id: 3,
@@ -31,7 +31,7 @@
         description: 'Functional movements at high intensity',
         duration: 50,
         calories: 720,
-        imageUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800',
+        imageUrl: 'https://res.cloudinary.com/dutmn3xde/image/upload/v1776611570/category_strength_nsba3a.jpg',
     },
     {
         id: 4,
@@ -41,7 +41,7 @@
         description: 'Explosive cardio for endurance and stamina',
         duration: 35,
         calories: 520,
-        imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800',
+        imageUrl: 'https://res.cloudinary.com/dutmn3xde/image/upload/v1776611721/gategory_cardio_at9k5v.jpg',
     },
     {
         id: 5,
@@ -51,7 +51,7 @@
         description: 'Pure strength training with progressive overload',
         duration: 55,
         calories: 480,
-        imageUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800',
+        imageUrl: 'https://res.cloudinary.com/dutmn3xde/image/upload/v1776611725/category_strenght_hard_ydduaa.jpg',
     },
     {
         id: 6,
@@ -61,7 +61,7 @@
         description: 'Boxing combinations and explosive power',
         duration: 40,
         calories: 580,
-        imageUrl: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800',
+        imageUrl: 'https://res.cloudinary.com/dutmn3xde/image/upload/v1776611827/catgory_combat_hard_tgrgsb.jpg',
     },
     {
         id: 7,
@@ -71,7 +71,7 @@
         description: 'Core-focused flexibility and controlled movements',
         duration: 50,
         calories: 320,
-        imageUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800',
+        imageUrl: 'https://res.cloudinary.com/dutmn3xde/image/upload/v1776611887/catgory_fexibility_moderate_d32ttr.jpg',
     },
     {
         id: 8,
@@ -81,7 +81,7 @@
         description: 'High-energy indoor cycling with rhythm-based intervals',
         duration: 45,
         calories: 600,
-        imageUrl: 'https://images.unsplash.com/photo-1534787238916-9ba6764efd4f?w=800',
+        imageUrl: 'https://res.cloudinary.com/dutmn3xde/image/upload/v1776611950/category_hard_spin_velocity_f1fker.jpg',
     },
     ];
 
