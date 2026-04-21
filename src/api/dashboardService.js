@@ -1,4 +1,3 @@
-import axiosClient from './axiosClient';
 import { getFutureWorkouts } from './workoutService';
 
 /**
