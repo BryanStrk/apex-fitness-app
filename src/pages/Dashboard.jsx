@@ -85,7 +85,7 @@ export default function Dashboard() {
         title: nextSession.title,
         description: nextSession.description,
         time: formatSessionTime(nextSession.date, nextSession.durationMinutes),
-        location: 'Floor Alpha', // estático de momento
+        location: 'Floor Alpha',
         coach: `Coach ${nextSession.professor?.name || 'TBA'}`,
         status: 'SCHEDULED',
       }
