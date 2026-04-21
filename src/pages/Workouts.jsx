@@ -1,30 +1,59 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Zap, Search, SlidersHorizontal, Loader2, AlertCircle } from 'lucide-react';
 import WorkoutCard from '../components/workouts/WorkoutCard';
-import { getAllWorkouts } from '../api/workoutService';
+import { getAllWorkouts, enrollUser, unenrollUser } from '../api/workoutService';
+import { getCurrentUser } from '../api/userService';
 
 export default function Workouts() {
   const [workouts, setWorkouts] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchWorkouts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await getAllWorkouts();
-        setWorkouts(data);
-      } catch (err) {
-        setError('No se pudieron cargar los workouts. ¿Está el backend corriendo?');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWorkouts();
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [workoutsData, userData] = await Promise.all([
+        getAllWorkouts(),
+        getCurrentUser(),
+      ]);
+      setWorkouts(workoutsData);
+      setCurrentUser(userData);
+    } catch (err) {
+      setError('No se pudieron cargar los workouts. ¿Está el backend corriendo?');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Comprueba si el usuario actual está inscrito en un workout
+  const isUserEnrolled = (workout) => {
+    if (!currentUser || !workout.users) return false;
+    return workout.users.some((u) => u.id === currentUser.id);
+  };
+
+  // Toggle enrollment: llama al backend e actualiza el workout en el state
+  const handleToggleEnroll = async (workoutId, isEnrolled) => {
+    if (!currentUser) {
+      throw new Error('No current user');
+    }
+
+    const updatedWorkout = isEnrolled
+      ? await unenrollUser(workoutId, currentUser.id)
+      : await enrollUser(workoutId, currentUser.id);
+
+    // Actualiza solo el workout que cambió, sin recargar toda la lista
+    setWorkouts((prev) =>
+      prev.map((w) => (w.id === workoutId ? updatedWorkout : w))
+    );
+  };
 
   return (
     <div>
@@ -76,7 +105,7 @@ export default function Workouts() {
             {error}
           </p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => fetchData()}
             className="font-['Bebas_Neue'] tracking-wider px-6 py-2 rounded-lg border border-red-500/30 text-red-300 hover:bg-red-500/10 transition"
           >
             RETRY
@@ -109,6 +138,8 @@ export default function Workouts() {
                 calories: w.caloriesEstimate,
                 imageUrl: w.imageUrl,
               }}
+              isEnrolled={isUserEnrolled(w)}
+              onToggleEnroll={handleToggleEnroll}
             />
           ))}
         </div>
