@@ -1,14 +1,23 @@
 import { useState, useEffect } from 'react';
-import { Zap, Search, SlidersHorizontal, Loader2, AlertCircle } from 'lucide-react';
+import { Zap, Search, Loader2, AlertCircle } from 'lucide-react';
 import WorkoutCard from '../components/workouts/WorkoutCard';
+import FilterChips from '../components/workouts/FilterChips';
 import { getAllWorkouts, enrollUser, unenrollUser } from '../api/workoutService';
 import { getCurrentUser } from '../api/userService';
+
+// Las opciones disponibles vienen de los enums del backend
+const CATEGORY_OPTIONS = ['HIIT', 'YOGA', 'STRENGTH', 'CARDIO', 'COMBAT', 'FLEXIBILITY'];
+const INTENSITY_OPTIONS = ['MODERATE', 'HARD', 'EXTREME'];
 
 export default function Workouts() {
   const [workouts, setWorkouts] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Estados de los filtros (null = "All")
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedIntensity, setSelectedIntensity] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -88,8 +97,23 @@ export default function Workouts() {
     }
   };
 
+  const clearFilters = () => {
+    setSelectedCategory(null);
+    setSelectedIntensity(null);
+  };
+
+  // Aplicar los filtros: si están a null no filtran
+  const filteredWorkouts = workouts.filter((w) => {
+    const matchesCategory = !selectedCategory || w.category === selectedCategory;
+    const matchesIntensity = !selectedIntensity || w.intensity === selectedIntensity;
+    return matchesCategory && matchesIntensity;
+  });
+
+  const hasActiveFilters = selectedCategory !== null || selectedIntensity !== null;
+
   return (
     <div>
+      {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4 text-[#D4FF00]">
           <Zap className="w-4 h-4" />
@@ -103,21 +127,49 @@ export default function Workouts() {
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-8">
-        <div className="flex-1 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search workouts..."
-            className="w-full bg-[#151515]/80 border border-[#1A1A1A] rounded-xl pl-11 pr-4 py-3 font-['Roboto_Mono'] text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#D4FF00]/30"
-          />
-        </div>
-        <button className="flex items-center gap-2 bg-[#151515]/80 border border-[#1A1A1A] rounded-xl px-5 py-3 font-['Roboto_Mono'] text-sm text-white hover:border-[#D4FF00]/30 transition">
-          <SlidersHorizontal className="w-4 h-4" />
-          Filters
-        </button>
+      {/* Search bar */}
+      <div className="mb-6 relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+        <input
+          type="text"
+          placeholder="Search workouts..."
+          className="w-full bg-[#151515]/80 border border-[#1A1A1A] rounded-xl pl-11 pr-4 py-3 font-['Roboto_Mono'] text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#D4FF00]/30"
+        />
       </div>
 
+      {/* Filtros */}
+      <div className="mb-8 space-y-4 bg-[#151515]/40 border border-[#1A1A1A] rounded-xl p-5">
+        <FilterChips
+          label="CATEGORY"
+          options={CATEGORY_OPTIONS}
+          selected={selectedCategory}
+          onChange={setSelectedCategory}
+        />
+        <FilterChips
+          label="INTENSITY"
+          options={INTENSITY_OPTIONS}
+          selected={selectedIntensity}
+          onChange={setSelectedIntensity}
+        />
+
+        {/* Contador y botón clear (solo si hay filtros activos) */}
+        {hasActiveFilters && (
+          <div className="flex items-center justify-between pt-3 border-t border-[#1A1A1A]">
+            <p className="font-['Roboto_Mono'] text-xs text-gray-400">
+              Showing <span className="text-[#D4FF00]">{filteredWorkouts.length}</span> of{' '}
+              <span className="text-gray-300">{workouts.length}</span> workouts
+            </p>
+            <button
+              onClick={clearFilters}
+              className="font-['Roboto_Mono'] text-xs text-red-300 hover:text-red-400 transition tracking-widest"
+            >
+              CLEAR FILTERS
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Loading state */}
       {loading && (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <Loader2 className="w-12 h-12 text-[#D4FF00] animate-spin" />
@@ -127,6 +179,7 @@ export default function Workouts() {
         </div>
       )}
 
+      {/* Error state */}
       {error && !loading && (
         <div className="flex flex-col items-center justify-center py-20 gap-4 border border-red-500/20 rounded-2xl bg-red-500/5">
           <AlertCircle className="w-12 h-12 text-red-400" />
@@ -142,6 +195,7 @@ export default function Workouts() {
         </div>
       )}
 
+      {/* Empty state (no workouts en BD) */}
       {!loading && !error && workouts.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <p className="font-['Roboto_Mono'] text-sm text-gray-400">
@@ -150,9 +204,25 @@ export default function Workouts() {
         </div>
       )}
 
-      {!loading && !error && workouts.length > 0 && (
+      {/* Empty state (filtros sin resultados) */}
+      {!loading && !error && workouts.length > 0 && filteredWorkouts.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 gap-4 border border-[#1A1A1A] rounded-2xl">
+          <p className="font-['Roboto_Mono'] text-sm text-gray-400 text-center">
+            No workouts match the selected filters.
+          </p>
+          <button
+            onClick={clearFilters}
+            className="font-['Bebas_Neue'] tracking-wider px-6 py-2 rounded-lg border border-[#D4FF00]/30 text-[#D4FF00] hover:bg-[#D4FF00]/10 transition"
+          >
+            CLEAR FILTERS
+          </button>
+        </div>
+      )}
+
+      {/* Workouts grid (solo los filtrados) */}
+      {!loading && !error && filteredWorkouts.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {workouts.map((w) => (
+          {filteredWorkouts.map((w) => (
             <WorkoutCard
               key={w.id}
               workout={{
