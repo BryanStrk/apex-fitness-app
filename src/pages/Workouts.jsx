@@ -18,6 +18,7 @@ export default function Workouts() {
   // Estados de los filtros (null = "All")
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedIntensity, setSelectedIntensity] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -100,16 +101,22 @@ export default function Workouts() {
   const clearFilters = () => {
     setSelectedCategory(null);
     setSelectedIntensity(null);
+    setSearchQuery('');
   };
 
   // Aplicar los filtros: si están a null no filtran
   const filteredWorkouts = workouts.filter((w) => {
     const matchesCategory = !selectedCategory || w.category === selectedCategory;
     const matchesIntensity = !selectedIntensity || w.intensity === selectedIntensity;
-    return matchesCategory && matchesIntensity;
+    const matchesSearch =
+      !searchQuery.trim() ||
+      w.title.toLowerCase().includes(searchQuery.trim().toLowerCase()) ||
+      w.description.toLowerCase().includes(searchQuery.trim().toLowerCase());
+    return matchesCategory && matchesIntensity && matchesSearch;
   });
 
-  const hasActiveFilters = selectedCategory !== null || selectedIntensity !== null;
+  const hasActiveFilters =
+    selectedCategory !== null || selectedIntensity !== null || searchQuery.trim() !== '';
 
   return (
     <div>
@@ -132,9 +139,20 @@ export default function Workouts() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
         <input
           type="text"
-          placeholder="Search workouts..."
-          className="w-full bg-[#151515]/80 border border-[#1A1A1A] rounded-xl pl-11 pr-4 py-3 font-['Roboto_Mono'] text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#D4FF00]/30"
+          placeholder="Search by title or description..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full bg-[#151515]/80 border border-[#1A1A1A] rounded-xl pl-11 pr-12 py-3 font-['Roboto_Mono'] text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#D4FF00]/30"
         />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#D4FF00] transition font-['Roboto_Mono'] text-xs"
+            aria-label="Clear search"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Filtros */}
