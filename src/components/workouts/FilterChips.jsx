@@ -9,7 +9,7 @@
  */
 export default function FilterChips({ label, options, selected, onChange }) {
   const baseChip =
-    "font-['Roboto_Mono'] text-xs tracking-widest px-3 py-1.5 rounded-full border transition";
+  "font-['Roboto_Mono'] text-xs tracking-widest px-3 py-1.5 rounded-full border transition focus:outline-none";
   const activeChip = "bg-[#D4FF00] text-black border-[#D4FF00]";
   const inactiveChip = "bg-transparent text-gray-300 border-[#1A1A1A] hover:border-[#D4FF00]/30";
 
